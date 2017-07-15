@@ -8,6 +8,8 @@ import store from './store'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 
+import './stylus/main.styl'
+
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
