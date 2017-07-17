@@ -1,14 +1,12 @@
 <template>
-  <v-app id="sticky-web" standalone dark>
-    <v-toolbar class="primary">
-      <v-toolbar-title>Sticky Web</v-toolbar-title>
-    </v-toolbar>
-    <main>
-      <v-container fluid>
-        <router-view></router-view>
-      </v-container>
-    </main>
-  </v-app>
+  <div class="layout" id="sticky-web">
+    <mu-appbar title="Sticky Web"></mu-appbar>
+    <div class="body">
+        <mu-content-block>
+          <router-view></router-view>
+        </mu-content-block>
+    </div>
+  </div>
 </template>
 
 <script>

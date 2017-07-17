@@ -1,34 +1,26 @@
 <template>
   <div id="app">
-    Hello World! Here are some example buttons to look at the colours.
-
-    <div>
-      <v-btn>Normal</v-btn>
-    </div>
-    <div>
-      <v-btn primary>Primary</v-btn>
-    </div>
-    <div>
-      <v-btn accent class="purple accent-4">Accent (Not supported with 'accent' property)</v-btn>
-    </div>
-    <div>
-      <v-btn secondary>Secondary</v-btn>
-    </div>
-    <div>
-      <v-btn warning>Warning</v-btn>
-    </div>
-    <div>
-      <v-btn success>Success</v-btn>
-    </div>
-    <div>
-      <v-btn info>Info</v-btn>
-    </div>
-    <div>
-      <v-btn error>Error</v-btn>
-    </div>
-    <div>
-      <v-btn primary disabled>Disabled</v-btn>
-    </div>
+    <mu-flexbox>
+      <mu-flexbox-item grow="1">
+        Hello World! Here are some example buttons to look at the colours.
+        <mu-text-field label="website" type="url" v-model="websiteUrl" />
+        <div>
+          <mu-raised-button fullWidth>Normal</mu-raised-button>
+        </div>
+        <div>
+          <mu-raised-button primary fullWidth>Primary</mu-raised-button>
+        </div>
+        <div>
+          <mu-raised-button secondary fullWidth>Secondary</mu-raised-button>
+        </div>
+        <div>
+          <mu-raised-button disabled fullWidth>Disabled</mu-raised-button>
+        </div>
+      </mu-flexbox-item>
+      <mu-flexbox-item grow="5">
+        <iframe :src="websiteUrl"></iframe>
+      </mu-flexbox-item>
+    </mu-flexbox>
   </div>
 </template>
 
@@ -40,6 +32,11 @@
     components: { SystemInformation },
     methods: {
 
+    },
+    data: function () {
+      return {
+        websiteUrl: 'http://cgagnier.ca'
+      }
     }
   }
 </script>
