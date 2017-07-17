@@ -7,7 +7,7 @@ import store from './store'
 
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
-import 'muse-ui/dist/theme-dark.css'
+import './less/appTheme.less'
 
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
