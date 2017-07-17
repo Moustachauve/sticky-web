@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <mu-flexbox>
-      <mu-flexbox-item grow="1">
+    <mu-flexbox align="stretch">
+      <mu-flexbox-item id="left-column" grow="0">
         Hello World! Here are some example buttons to look at the colours.
         <mu-text-field label="website" type="url" v-model="websiteUrl" />
         <div>
@@ -17,8 +17,8 @@
           <mu-raised-button disabled fullWidth>Disabled</mu-raised-button>
         </div>
       </mu-flexbox-item>
-      <mu-flexbox-item grow="5">
-        <iframe :src="websiteUrl"></iframe>
+      <mu-flexbox-item>
+        <webview :src="websiteUrl"></webview>
       </mu-flexbox-item>
     </mu-flexbox>
   </div>
@@ -42,7 +42,16 @@
 </script>
 
 <style>
-  .main-content {
+  #app, #app > .mu-flexbox {
+    height: 100%;
+  }
+
+  webview {
+    height: 100%
+  }
+
+  #left-column {
+    width: 300px;
     padding: 16px;
   }
 </style>

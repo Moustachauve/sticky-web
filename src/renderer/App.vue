@@ -1,11 +1,11 @@
 <template>
   <div class="layout" id="sticky-web">
-    <mu-appbar title="Sticky Web"></mu-appbar>
-    <div class="body">
-        <mu-content-block>
-          <router-view></router-view>
-        </mu-content-block>
-    </div>
+    <mu-flexbox orient="vertical" justify="start" id="main-container">
+      <mu-appbar title="Sticky Web"></mu-appbar>
+      <div class="body mu-flexbox-item">
+        <router-view></router-view>
+      </div>
+    </mu-flexbox>
   </div>
 </template>
 
@@ -21,4 +21,8 @@
   /* CSS */
   @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic');
   @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+  html, body, #sticky-web, #main-container {
+    height: 100%;
+  }
 </style>
