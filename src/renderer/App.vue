@@ -25,4 +25,8 @@
   html, body, #sticky-web, #main-container {
     height: 100%;
   }
+
+  .mu-appbar-title > span {
+    color: white;
+  }
 </style>
