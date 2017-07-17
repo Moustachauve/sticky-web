@@ -2,6 +2,9 @@
   <div id="app">
     <mu-flexbox align="stretch">
       <mu-flexbox-item id="left-column" grow="0">
+        <div>
+          <mu-flat-button secondary fullWidth icon="arrow_back" to="/">Go back</mu-flat-button>
+        </div>
         <mu-text-field label="website" type="url" v-model="websiteUrl" full-width />
         <div>
           <div>Actual loaded URL:</div>
