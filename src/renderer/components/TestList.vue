@@ -6,7 +6,7 @@
     </mu-content-block>
     <mu-content-block>
       <mu-raised-button secondary label="Run All" icon="fast_forward" />
-      <mu-raised-button secondary label="Add" icon="add" to="editor" />
+      <mu-raised-button secondary label="Add" icon="add" @click="openCreateDialog" />
     </mu-content-block>
     
     <mu-divider />
@@ -23,7 +23,7 @@
         <tr v-for="(test, index) in tests" v-bind:key="index">
           <td><div :class="'test-status ' + test.status"></div></td>
           <td>{{test.name}}</td>
-          <td>{{test.lastRun.toLocaleDateString()}} {{test.lastRun.toLocaleTimeString()}}</td>
+          <td>{{displayDate(test.lastRun)}}</td>
           <td>
             <mu-icon-button tooltip="Run" icon="play_arrow" />
             <mu-icon-button tooltip="Edit" icon="edit" to="editor" />
@@ -31,25 +31,51 @@
         </tr>
       </table>
     </mu-content-block>
+    <TestCreateDialog :open="createDialogOpened" v-on:close="closeCreateDialog" v-on:createTest="createTest"></TestCreateDialog>
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'test-list',
-    methods: {
+  import TestCreateDialog from './TestCreateDialog'
+  import { ipcRenderer } from 'electron'
 
+export default {
+    name: 'test-list',
+    components: { TestCreateDialog },
+    methods: {
+      openCreateDialog () {
+        this.createDialogOpened = true
+      },
+      closeCreateDialog () {
+        this.createDialogOpened = false
+      },
+      createTest (params) {
+        console.log(params)
+        this.createDialogOpened = false
+        ipcRenderer.send('createNewTest', params)
+      },
+      displayDate (date) {
+        if (!date) {
+          return 'Never'
+        }
+        if (typeof date === 'string') {
+          date = new Date(date)
+        }
+
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+      }
     },
     data: function () {
       return {
-        tests: [
+        createDialogOpened: false,
+        tests: [/*
           {name: 'hello test 1', status: 'success', lastRun: new Date()},
           {name: 'hello test 2', status: 'fail', lastRun: new Date()},
           {name: 'hello test 3', status: 'fail', lastRun: new Date()},
           {name: 'hello test 4', status: 'success', lastRun: new Date()},
           {name: 'hello test 5', status: 'executing', lastRun: new Date()},
           {name: 'hello test 6', status: '', lastRun: new Date()}
-        ]
+        */]
       }
     },
     computed: {
@@ -66,6 +92,17 @@
       testExecuting: function () {
         return countTestWithStatus(this.tests, 'executing')
       }
+    },
+    mounted: function () {
+      ipcRenderer.on('createNewTestDone', function (event, test) {
+        this.tests.push(test)
+      }.bind(this))
+
+      ipcRenderer.on('loadAllTestsResult', function (event, tests) {
+        this.tests = tests || []
+      }.bind(this))
+
+      ipcRenderer.send('loadAllTests')
     }
   }
 

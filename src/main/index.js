@@ -1,6 +1,9 @@
 'use strict'
 
 import { app, BrowserWindow } from 'electron'
+import windowStateKeeper from 'electron-window-state'
+
+import './lib/testFile'
 
 /**
  * Set `__static` path to static files in production
@@ -11,18 +14,28 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow
+let mainWindowState
+
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
 
 function createWindow () {
+  mainWindowState = windowStateKeeper({
+    defaultHeight: 600,
+    defaultWidth: 1200
+  })
+
   /**
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 563,
     useContentSize: true,
-    width: 1000
+    height: mainWindowState.height,
+    width: mainWindowState.width,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    isMaximized: mainWindowState.isMaximized
   })
 
   mainWindow.setMenu(null)
@@ -31,6 +44,8 @@ function createWindow () {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+
+  mainWindowState.manage(mainWindow)
 }
 
 app.on('ready', createWindow)
