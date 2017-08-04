@@ -10,7 +10,9 @@ module.exports = testFile
 
 testFile.createTest = function (testData, callback) {
   testData.uuid = uuidv4()
-  testData.lastRun = new Date()
+  testData.lastRun = ''
+  testData.created = new Date()
+  testData.updated = new Date()
   testData.status = ''
   testFile.save(testData, function (err) {
     if (callback) {
@@ -44,6 +46,12 @@ function readAddFileRecursive (files, tests, callback) {
   }, currentFile)
 }
 
+function deleteTest (test, callback) {
+  testFile.delete(function (err) {
+    callback(err)
+  }, test.uuid + '.json')
+}
+
 ipcMain.on('createNewTest', (event, testData) => {
   console.log('Creating new test...')
   testFile.createTest(testData, function (err, testData) {
@@ -57,5 +65,12 @@ ipcMain.on('loadAllTests', (event, testData) => {
   testFile.loadAllTests(function (err, tests) {
     if (err) throw err
     event.sender.send('loadAllTestsResult', tests)
+  })
+})
+
+ipcMain.on('deleteTest', (event, test) => {
+  console.log('Deleting test "' + test.uuid + '"...')
+  deleteTest(test, function (err) {
+    if (err) throw err
   })
 })

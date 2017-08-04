@@ -52,6 +52,20 @@ module.exports = function () {
     })
   }
 
+  dataFile.delete = function (callback, fileName) {
+    if (!fileName) {
+      fileName = dataFile.getFileName()
+    }
+
+    let filePath = path.join(dataFile.getFileFolder(), fileName)
+    dataFile.ensureFolderExists(function (err) {
+      if (err) { return callback(err) }
+      fs.unlink(filePath, function (err) {
+        callback(err)
+      })
+    })
+  }
+
   dataFile.getFileVersion = function () {
     return 1
   }

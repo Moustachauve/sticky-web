@@ -25,8 +25,9 @@
           <td>{{test.name}}</td>
           <td>{{displayDate(test.lastRun)}}</td>
           <td>
-            <mu-icon-button tooltip="Run" icon="play_arrow" />
+            <mu-icon-button tooltip="Delete" icon="delete" v-on:click="deleteTest(index, test)" />
             <mu-icon-button tooltip="Edit" icon="edit" to="editor" />
+            <mu-icon-button tooltip="Run" icon="play_arrow" />
           </td>
         </tr>
       </table>
@@ -63,19 +64,17 @@ export default {
         }
 
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+      },
+      deleteTest (index, test) {
+        console.log('delete', index, test)
+        ipcRenderer.send('deleteTest', test)
+        this.tests.splice(index, 1)
       }
     },
     data: function () {
       return {
         createDialogOpened: false,
-        tests: [/*
-          {name: 'hello test 1', status: 'success', lastRun: new Date()},
-          {name: 'hello test 2', status: 'fail', lastRun: new Date()},
-          {name: 'hello test 3', status: 'fail', lastRun: new Date()},
-          {name: 'hello test 4', status: 'success', lastRun: new Date()},
-          {name: 'hello test 5', status: 'executing', lastRun: new Date()},
-          {name: 'hello test 6', status: '', lastRun: new Date()}
-        */]
+        tests: []
       }
     },
     computed: {
@@ -132,7 +131,7 @@ export default {
   }
 
   #test-list .col-actions {
-    width: 125px;
+    width: 155px;
   }
 
   .test-status {
