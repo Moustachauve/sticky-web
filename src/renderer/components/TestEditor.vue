@@ -5,7 +5,8 @@
         <div>
           <mu-flat-button secondary fullWidth icon="arrow_back" to="/">Go back</mu-flat-button>
         </div>
-        <mu-text-field label="Starting Url" type="url" v-model="websiteUrl" full-width />
+        <h3>{{test.name}}</h3>
+        <mu-text-field label="Starting Url" type="url" v-model="test.startUrl" full-width />
         <div>
           <div>Currently loaded URL:</div>
           <div class="url-box">{{websiteUrlLoaded}}</div>
@@ -18,7 +19,7 @@
       <mu-flexbox-item class="mu-paper mu-paper-round mu-paper-2">
         <mu-flexbox orient="vertical" justify="stretch" id="main-container">
           <div id="preview-title"><span>Title:</span> {{pageTitle}}</div>
-          <webview :src="websiteUrl" id="preview-webview" class="mu-flexbox-item" :preload="'file://' + dirPath + '/../preview-injector.js'"></webview>
+          <webview :src="test.startUrl" id="preview-webview" class="mu-flexbox-item" :preload="'file://' + dirPath + '/../preview-injector.js'"></webview>
         </mu-flexbox>
       </mu-flexbox-item>
     </mu-flexbox>
@@ -27,6 +28,7 @@
 
 <script>
   // const {remote} = require('electron')
+  import { ipcRenderer } from 'electron'
   const path = require('path')
   var webview
 
@@ -41,33 +43,46 @@
     },
     data: function () {
       return {
-        websiteUrl: 'http://cgagnier.ca',
+        test: [],
         websiteUrlLoaded: '',
         pageTitle: pageTitle,
         dirPath: path.resolve(__dirname) /* app.getAppPath() */
       }
     },
+    props: ['uuid'],
     mounted: function () {
-      console.log('onload?')
-      webview = document.getElementById('preview-webview')
+      if (!this.uuid) {
+        return this.$router.push({name: 'test-list'})
+      }
 
+      ipcRenderer.on('loadTestResult', function (event, test) {
+        this.test = test || []
+      }.bind(this))
+
+      ipcRenderer.send('loadTest', this.uuid)
+
+      webview = document.getElementById('preview-webview')
       if (webview) {
-        webview.addEventListener('dom-ready', () => {
-          webview.openDevTools()
-        })
-        webview.addEventListener('ipc-message', function (e) {
-          console.log('ipc-message', e.channel, e.args)
-          if (e.channel === 'window-data') {
-            this.pageTitle = e.args[0].title
-            this.websiteUrlLoaded = e.args[0].url
-          } else if (e.channel === 'element-clicked') {
-            webview.send('stopSelect')
-          }
-        }.bind(this))
+        loadWebview(webview, this)
       } else {
         console.error('Webview not found!')
       }
     }
+  }
+
+  function loadWebview (webview, vuejs) {
+    webview.addEventListener('dom-ready', () => {
+      // webview.openDevTools()
+    })
+    webview.addEventListener('ipc-message', function (e) {
+      console.log('ipc-message', e.channel, e.args)
+      if (e.channel === 'window-data') {
+        this.pageTitle = e.args[0].title
+        this.websiteUrlLoaded = e.args[0].url
+      } else if (e.channel === 'element-clicked') {
+        webview.send('stopSelect')
+      }
+    }.bind(vuejs))
   }
 
 </script>

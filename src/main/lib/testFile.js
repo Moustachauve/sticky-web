@@ -33,6 +33,18 @@ testFile.loadAllTests = function (callback) {
   })
 }
 
+testFile.loadTest = function (uuid, callback) {
+  testFile.load(function (err, test) {
+    return callback(err, test)
+  }, uuid + '.json')
+}
+
+testFile.deleteTest = function (test, callback) {
+  testFile.delete(function (err) {
+    callback(err)
+  }, test.uuid + '.json')
+}
+
 function readAddFileRecursive (files, tests, callback) {
   if (files.length === 0) {
     return callback(null, tests)
@@ -44,12 +56,6 @@ function readAddFileRecursive (files, tests, callback) {
     tests.push(test)
     readAddFileRecursive(files, tests, callback)
   }, currentFile)
-}
-
-function deleteTest (test, callback) {
-  testFile.delete(function (err) {
-    callback(err)
-  }, test.uuid + '.json')
 }
 
 ipcMain.on('createNewTest', (event, testData) => {
@@ -70,7 +76,15 @@ ipcMain.on('loadAllTests', (event, testData) => {
 
 ipcMain.on('deleteTest', (event, test) => {
   console.log('Deleting test "' + test.uuid + '"...')
-  deleteTest(test, function (err) {
+  testFile.deleteTest(test, function (err) {
     if (err) throw err
+  })
+})
+
+ipcMain.on('loadTest', (event, uuid) => {
+  console.log('Loading test "' + uuid + '"...')
+  testFile.loadTest(uuid, function (err, test) {
+    if (err) throw err
+    event.sender.send('loadTestResult', test)
   })
 })

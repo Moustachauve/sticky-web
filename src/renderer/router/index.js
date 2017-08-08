@@ -11,8 +11,9 @@ export default new Router({
       component: require('@/components/TestList')
     },
     {
-      path: '/editor',
+      path: '/editor/:uuid',
       name: 'test-editor',
+      props: true,
       component: require('@/components/TestEditor')
     },
     {

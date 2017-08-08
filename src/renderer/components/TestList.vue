@@ -26,7 +26,7 @@
           <td>{{displayDate(test.lastRun)}}</td>
           <td>
             <mu-icon-button tooltip="Delete" icon="delete" v-on:click="deleteTest(index, test)" />
-            <mu-icon-button tooltip="Edit" icon="edit" to="editor" />
+            <mu-icon-button tooltip="Edit" icon="edit" v-on:click="openTest(test)" />
             <mu-icon-button tooltip="Run" icon="play_arrow" />
           </td>
         </tr>
@@ -66,9 +66,11 @@ export default {
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
       },
       deleteTest (index, test) {
-        console.log('delete', index, test)
         ipcRenderer.send('deleteTest', test)
         this.tests.splice(index, 1)
+      },
+      openTest (test) {
+        this.$router.push({name: 'test-editor', params: { uuid: test.uuid }})
       }
     },
     data: function () {
@@ -95,6 +97,7 @@ export default {
     mounted: function () {
       ipcRenderer.on('createNewTestDone', function (event, test) {
         this.tests.push(test)
+        this.openTest(test)
       }.bind(this))
 
       ipcRenderer.on('loadAllTestsResult', function (event, tests) {
