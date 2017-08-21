@@ -72,7 +72,7 @@
 
   function loadWebview (webview, vuejs) {
     webview.addEventListener('dom-ready', () => {
-      // webview.openDevTools()
+      webview.openDevTools()
     })
     webview.addEventListener('ipc-message', function (e) {
       console.log('ipc-message', e.channel, e.args)

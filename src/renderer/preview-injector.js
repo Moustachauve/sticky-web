@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log(isSelectingElement)
   })
   ipcRenderer.on('stopSelect', function () {
-    console.log('bbbb')
     isSelectingElement = false
   })
 
@@ -45,7 +44,21 @@ document.addEventListener('DOMContentLoaded', function () {
         alert('This element is not yet supported (Browser restriction)')
       }
       console.log(uniqueSelector)
-      ipcRenderer.sendToHost('element-clicked', uniqueSelector)
+
+      var objAttributes = {}
+      var attributes = [...e.target.attributes]
+
+      for (var attr in attributes) {
+        objAttributes[attributes[attr].name] = attributes[attr].value
+      }
+
+      ipcRenderer.sendToHost('element-clicked', {
+        uniqueSelector: uniqueSelector,
+        target: {
+          tagName: e.target.tagName,
+          attributes: objAttributes
+        }
+      })
     }
   }, true)
 
