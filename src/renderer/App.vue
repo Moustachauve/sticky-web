@@ -23,10 +23,14 @@
   @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
   html, body, #sticky-web, #main-container {
-    height: 100%;
+    height: 100%;color: #ffffff;
   }
 
   .mu-appbar-title > span {
     color: white;
+  }
+  
+  .mu-flat-button-primary {
+      color: #4fc3f7;
   }
 </style>

@@ -52,10 +52,6 @@
 </script>
 
 <<style>
-  .mu-flat-button-primary {
-      color: #4fc3f7;
-  }
-
   .mu-text-field {
     width: 100%;
   }

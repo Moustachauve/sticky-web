@@ -14,15 +14,73 @@
         <div>
           <mu-raised-button fullWidth icon="my_location" v-on:click="selectElement">Select Element</mu-raised-button>
         </div>
-        
       </mu-flexbox-item>
+
       <mu-flexbox-item class="mu-paper mu-paper-round mu-paper-2">
         <mu-flexbox orient="vertical" justify="stretch" id="main-container">
           <div id="preview-title"><span>Title:</span> {{pageTitle}}</div>
           <webview :src="test.startUrl" id="preview-webview" class="mu-flexbox-item" :preload="'file://' + dirPath + '/../preview-injector.js'"></webview>
         </mu-flexbox>
       </mu-flexbox-item>
+
+      <mu-flexbox-item id="right-column" grow="0">
+        <h3>Actions</h3>
+        <mu-raised-button fullWidth icon="my_location" v-on:click="selectElement" primary>Add</mu-raised-button>
+        <mu-raised-button fullWidth icon="fast_forward" v-on:click="selectElement" secondary>Run All</mu-raised-button>
+        <mu-raised-button fullWidth icon="play_arrow" v-on:click="playNextAction" secondary>Next Step</mu-raised-button>
+        <mu-raised-button fullWidth icon="replay" v-on:click="resetNextAction" secondary>Reset</mu-raised-button>
+        <table>
+          <tbody>
+            <template v-for="(action, index) in test.actions">
+              <tr v-bind:key="index" v-if="currentActionIndex == index" class="currentActionIndicator">
+                <td colspan="2"></td>
+              </tr>
+              <tr v-bind:key="index">
+                <td>{{action.event}}</td>
+                <td><span class="label">{{action.element.target.tagName}}</span> {{action.element.uniqueSelector}}</td>
+              </tr>
+            </template>
+
+            <tr v-if="this.test.actions && this.currentActionIndex === this.test.actions.length" class="currentActionIndicator">
+              <td colspan="2"></td>
+            </tr>
+          </tbody>
+        </table>
+      </mu-flexbox-item>
     </mu-flexbox>
+
+    <mu-dialog :open="actionPickerVisible" title="Element Picked" @close="closeActionPicker">
+      <p v-if="lastPickedElement.element && lastPickedElement.element.target">
+        <span class="label">{{lastPickedElement.element.target.tagName}}</span> {{lastPickedElement.element.uniqueSelector}}
+      </p>
+      <p>
+        <span class="label">Attributes:</span>
+        <table>
+          <thead>
+            <tr>
+              <td>Name</td>
+              <td>Value</td>
+              <td>Check for same value</td>
+            </tr>
+          </thead>
+          <tbody v-if="lastPickedElement.element && lastPickedElement.element.target && lastPickedElement.element.target.attributes">
+            <tr v-for="(attribute, index) in lastPickedElement.element.target.attributes" v-bind:key="index">
+              <td>{{index}}</td>
+              <td>{{attribute}}</td>
+              <td><input type="checkbox" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </p>
+      <form id="actionPickerForm" v-on:submit="closeActionPicker" v-if="lastPickedElement">
+        <h2>Pick an action</h2>
+        <label><input type="radio" v-model="lastPickedElement.event" value="" />Nothing</label>
+        <label><input type="radio" v-model="lastPickedElement.event" value="click" />Click</label>
+      </form>
+
+      <mu-flat-button slot="actions" @click="closeActionPicker" secondary label="Cancel" />
+      <mu-flat-button slot="actions" @click="addAction" primary label="Add" />
+    </mu-dialog>
   </div>
 </template>
 
@@ -39,14 +97,43 @@
     methods: {
       selectElement: function () {
         webview.send('startSelect')
+      },
+      closeActionPicker: function () {
+        this.actionPickerVisible = false
+      },
+      showActionPicker: function () {
+        this.actionPickerVisible = true
+      },
+      addAction: function () {
+        if (!this.test.actions) {
+          this.test.actions = []
+        }
+        this.test.actions.push(this.lastPickedElement)
+
+        this.closeActionPicker()
+        this.playNextAction()
+      },
+      playNextAction: function () {
+        if (!this.test.actions || this.currentActionIndex === this.test.actions.length) {
+          return
+        }
+        this.currentActionIndex++
+      },
+      resetNextAction: function () {
+        this.currentActionIndex = 0
       }
     },
     data: function () {
       return {
-        test: [],
+        test: {
+          actions: []
+        },
+        currentActionIndex: 0,
+        lastPickedElement: {},
         websiteUrlLoaded: '',
         pageTitle: pageTitle,
-        dirPath: path.resolve(__dirname) /* app.getAppPath() */
+        dirPath: path.resolve(__dirname), /* app.getAppPath() */
+        actionPickerVisible: false
       }
     },
     props: ['uuid'],
@@ -81,6 +168,11 @@
         this.websiteUrlLoaded = e.args[0].url
       } else if (e.channel === 'element-clicked') {
         webview.send('stopSelect')
+        this.lastPickedElement = {
+          event: '',
+          element: e.args[0]
+        }
+        this.showActionPicker()
       }
     }.bind(vuejs))
   }
@@ -96,7 +188,7 @@
     height: 100%
   }
 
-  #left-column {
+  #left-column, #right-column {
     width: 250px;
     padding: 16px;
   }
@@ -112,5 +204,18 @@
 
   .url-box {
     overflow-x: auto;
+  }
+
+  .label {
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+  .mu-dialog-body {
+    color: #ffffff;
+  }
+
+  .currentActionIndicator td {
+    border-bottom: 2px solid chartreuse;
   }
 </style>
